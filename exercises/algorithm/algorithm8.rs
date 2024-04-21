@@ -2,7 +2,6 @@
     queue
     This question requires you to use queues to implement the functionality of the stac
 */
-// I AM NOT DONE
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -67,32 +66,66 @@ impl<T> myStack<T> {
     }
     pub fn push(&mut self, elem: T) {
         if self.cur_queue == 0 {
-            self.q1.enqueue(elem);
-        } else {
             self.q2.enqueue(elem);
+            while let Ok(n) = self.q1.dequeue() {
+                self.q2.enqueue(n)
+            }
+            self.cur_queue = 1
+        } else {
+            self.q1.enqueue(elem);
+            while let Ok(n) = self.q2.dequeue() {
+                self.q1.enqueue(n)
+            }
+
+            self.cur_queue = 0;
         }
     }
+
     pub fn pop(&mut self) -> Result<T, &str> {
         if self.cur_queue == 0 {
-            while true {
-                let n = self.q1.dequeue()?;
-                if self.q1.is_empty() {
-                    return Ok(n);
-                } else {
-                    self.q2.enqueue(n)
-                }
+            if self.q1.is_empty() {
+                return Err("Stack is empty");
             }
+            self.q1.dequeue()
         } else {
-            while true {
-                let n = self.q2.dequeue()?;
-                if self.q2.is_empty() {
-                    return Ok(n);
-                } else {
-                    self.q1.enqueue(n)
-                }
+            if self.q2.is_empty() {
+                return Err("Stack is empty");
             }
+            self.q2.dequeue()
         }
     }
+    // pub fn push(&mut self, elem: T) {
+    //     if self.cur_queue == 0 {
+    //         self.q1.enqueue(elem);
+    //     } else {
+    //         self.q2.enqueue(elem);
+    //     }
+    // }
+    // pub fn pop(&mut self) -> Result<T, &str> {
+    //     if self.cur_queue == 0 {
+    //         while true {
+    //             let n = self.q1.dequeue()?;
+    //             if self.q1.is_empty() {
+    //                 self.cur_queue = 1;
+    //                 return Ok(n);
+    //             } else {
+    //                 self.q2.enqueue(n)
+    //             }
+    //         }
+    //         Err("")
+    //     } else {
+    //         while true {
+    //             let n = self.q2.dequeue()?;
+    //             if self.q2.is_empty() {
+    //                 self.cur_queue = 0;
+    //                 return Ok(n);
+    //             } else {
+    //                 self.q1.enqueue(n)
+    //             }
+    //         }
+    //         Err("")
+    //     }
+    // }
     pub fn is_empty(&self) -> bool {
         if self.cur_queue == 0 {
             self.q1.is_empty()
